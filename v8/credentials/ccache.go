@@ -98,9 +98,9 @@ func (c *CCache) Unmarshal(b []byte) error {
 			return err
 		}
 	}
-	c.DefaultPrincipal = parsePrincipal(b, &p, c, &endian)
+	c.DefaultPrincipal = ParsePrincipal(b, &p, c, &endian)
 	for p < len(b) {
-		cred, err := parseCredential(b, &p, c, &endian)
+		cred, err := ParseCredential(b, &p, c, &endian)
 		if err != nil {
 			return err
 		}
@@ -131,7 +131,7 @@ func parseHeader(b []byte, p *int, c *CCache, e *binary.ByteOrder) error {
 }
 
 // Parse the Keytab bytes of a principal into a Keytab entry's principal.
-func parsePrincipal(b []byte, p *int, c *CCache, e *binary.ByteOrder) (princ principal) {
+func ParsePrincipal(b []byte, p *int, c *CCache, e *binary.ByteOrder) (princ principal) {
 	if c.Version != 1 {
 		//Name Type is omitted in version 1
 		princ.PrincipalName.NameType = readInt32(b, p, e)
@@ -150,10 +150,10 @@ func parsePrincipal(b []byte, p *int, c *CCache, e *binary.ByteOrder) (princ pri
 	return princ
 }
 
-func parseCredential(b []byte, p *int, c *CCache, e *binary.ByteOrder) (cred *Credential, err error) {
+func ParseCredential(b []byte, p *int, c *CCache, e *binary.ByteOrder) (cred *Credential, err error) {
 	cred = new(Credential)
-	cred.Client = parsePrincipal(b, p, c, e)
-	cred.Server = parsePrincipal(b, p, c, e)
+	cred.Client = ParsePrincipal(b, p, c, e)
+	cred.Server = ParsePrincipal(b, p, c, e)
 	key := types.EncryptionKey{}
 	key.KeyType = int32(readInt16(b, p, e))
 	if c.Version == 3 {
